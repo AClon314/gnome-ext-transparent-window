@@ -1,0 +1,12 @@
+{
+  "name": "Transparent Window",
+  "description": "Adjust transparency(alpha) of window by Super+Mouse_Scroll, designed for gnome 46",
+  "uuid": "transparent-window@aclon",
+  "shell-version": [
+    "46",
+    "42"
+  ],
+  "url": "https://github.com/AClon314/gnome-ext-transparent-window",
+  "gettext-domain": "transparent-window@aclon",
+  "settings-schema": "org.gnome.shell.extensions.transparent-window"
+}
