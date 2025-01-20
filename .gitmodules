@@ -1,3 +1,4 @@
 [submodule "gnome-shell"]
 	path = gnome-shell
 	url = https://github.com/GNOME/gnome-shell
+	shallow = true
