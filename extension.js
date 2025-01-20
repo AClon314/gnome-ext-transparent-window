@@ -9,15 +9,28 @@ export default class TransparentWindow extends Extension {
         super(metadata);
         Logger.init(this);
     }
-    enable() {
-        Logger.debug('TransparentWindow enabled');
 
-        this._alwaysOnTop_ = _('Always on Top');
+    initLocalTranslations() {
+        // this.initTranslations('gnome-shell');
+        const en = [
+            'Always on Top',
+        ]
+        this._texts = {};
+        en.forEach((text) => {
+            this._texts[text] = _(text);
+        });
+
         this.initTranslations('transparent-window@aclon');
+        Logger.debug(`_texts=${JSON.stringify(this._texts)}`);
+    }
+
+    enable() {
+        this.initLocalTranslations();
 
         this._injectionManager = new InjectionManager();
         this._injectionManager.overrideMethod(WindowMenu.WindowMenu.prototype, '_buildMenu',
             originalMethod => {
+                const self = this;
                 return function (window) {
                     originalMethod.call(this, window);
                     this.myItem = new PopupMenu.PopupMenuItem(_('Transparency'), true, {});
@@ -38,14 +51,13 @@ export default class TransparentWindow extends Extension {
                     // search for the "Always on Top" button
                     let pos = 0;
                     for (pos = 0; pos < items.length; pos++) {
-                        if (items[pos].toString().includes(this._alwaysOnTop_)) {
+                        const str = items[pos].toString();
+                        if (str.includes(self._texts['Always on Top'])) {
                             break;
                         }
                     }
 
-                    this.addMenuItem(this.myItem, pos);
-
-                    Logger.debug('always on top', this._alwaysOnTop_);
+                    this.addMenuItem(this.myItem, pos + 1);
                 }
             }
         );
