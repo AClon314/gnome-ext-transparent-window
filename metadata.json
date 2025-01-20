@@ -7,6 +7,6 @@
     "42"
   ],
   "url": "https://github.com/AClon314/gnome-ext-transparent-window",
-  "gettext-domain": "transparent-window@aclon",
+  "gettext-domain": "gnome-shell",
   "settings-schema": "org.gnome.shell.extensions.transparent-window"
 }
