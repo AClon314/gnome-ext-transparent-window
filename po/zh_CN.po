@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-19 15:43+0800\n"
-"PO-Revision-Date: 2025-01-19 15:43+0800\n"
+"POT-Creation-Date: 2025-01-20 14:15+0800\n"
+"PO-Revision-Date: 2025-01-20 14:15+0800\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "Language: zh_CN\n"
@@ -17,6 +17,10 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: extension.js:12
+#: slider.js:32
+msgid "Brightness"
+msgstr ""
+
+#: extension.js:54
 msgid "Transparency"
 msgstr "透明度"

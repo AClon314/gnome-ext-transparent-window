@@ -40,4 +40,4 @@ const execCommand = async (command) => {
     });
 };
 
-execCommand('./run.sh');
+execCommand('./test/run.sh');

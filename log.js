@@ -61,10 +61,10 @@ export class Logger {
             return;
 
         const allLevels = Object.values(GLib.LogLevelFlags);
-        const domains = GLib.getenv('G_MESSAGES_DEBUG');
+        const domains = GLib.getenv('G_MESSAGES_DEBUG');    // Addon Name
         const { name: domain } = extension.metadata;
         this.uuid = extension.metadata.uuid;
-        Logger._domain = domain.replaceAll(' ', '-');
+        Logger._domain = domain.replaceAll(' ', '-');   // Addon-Name
 
         if (domains === 'all' || (domains && domains.split(' ').includes(Logger._domain))) {
             Logger._levels = allLevels;

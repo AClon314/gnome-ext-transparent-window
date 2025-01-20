@@ -5,11 +5,11 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Run GNOME Shell",
+            "name": "GNOME Shell",
             "request": "launch",
             "outputCapture": "std",
             "type": "node",
-            "program": "${workspaceFolder}/run.js",
+            "program": "${workspaceFolder}/test/run.js",
             // "console": "integratedTerminal",
         }
     ]
