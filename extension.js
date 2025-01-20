@@ -2,8 +2,10 @@ import { Extension, InjectionManager, gettext as _ } from 'resource:///org/gnome
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
-import * as WindowMenu from 'resource:///org/gnome/shell/ui/windowMenu.js';
+import { WindowMenu } from 'resource:///org/gnome/shell/ui/windowMenu.js';
+import { Slider } from 'resource:///org/gnome/shell/ui/slider.js';
 import { Logger } from './log.js';
+import Atk from 'gi://Atk';
 
 export default class TransparentWindow extends Extension {
 
@@ -13,7 +15,7 @@ export default class TransparentWindow extends Extension {
     }
 
     initLocalTranslations() {
-        /* this.initTranslations('gnome-shell'); */
+        this.initTranslations('gnome-shell');
         const en = [
             'Always on Top',
         ]
@@ -45,33 +47,36 @@ export default class TransparentWindow extends Extension {
         this.initLocalTranslations();
 
         this._injectionManager = new InjectionManager();
-        this._injectionManager.overrideMethod(WindowMenu.WindowMenu.prototype, '_buildMenu',
+        this._injectionManager.overrideMethod(WindowMenu.prototype, '_buildMenu',
             originalMethod => {
                 const self = this;
                 let pos = 5;
                 return function (window) {
                     originalMethod.call(this, window);
-                    this.myItem = new PopupMenu.PopupMenuItem(_('Transparency'), true, {});
-                    // this.myItem.icon.icon_name = 'preferences-desktop-wallpaper-symbolic';
+                    // this.myItem = new PopupMenu.PopupMenuItem(_('Transparency'), true, {});
+
+                    let noneSlider = new Slider(0);
+                    let noneSliderItem = new PopupMenu.PopupBaseMenuItem({ activate: false });
+                    noneSliderItem.setOrnament(PopupMenu.Ornament.CHECK)
+                    noneSliderItem.add_accessible_state(Atk.StateType.CHECKED)
+                    noneSliderItem.add_child(noneSlider);
+
 
                     let items = this._getMenuItems();
 
-                    // Remove "Take screenshot" off the window menu
                     //items[0].destroy();
-
-                    // Move "Take screenshot" just below the "Resize" button
                     // this.moveMenuItem(items[0], 4);
 
-                    // Move "Take screenshot" just above the "Close" button
-                    // Note: The separator line above the Close button counts as an item
-                    //this.moveMenuItem(items[0],items.length-3);
-
                     /* search for the "Always on Top" button */
-                    if (!items[pos].toString().includes(self._texts['Always on Top'])) {
-                        for (pos = items.length; pos >= 0; pos--)
-                            if (items[pos].toString().includes(self._texts['Always on Top'])) break;
+                    function is_onTop() {
+                        return items[pos].toString().includes(self._texts['Always on Top']);
                     }
-                    this.addMenuItem(this.myItem, pos + 1);
+                    if (!is_onTop()) {
+                        for (pos = items.length; pos >= 0; pos--)
+                            if (is_onTop()) break;
+                    }
+                    Logger.dir(items[pos], 'items[pos]');
+                    this.addMenuItem(noneSliderItem, pos + 1);
                 }
             }
         );

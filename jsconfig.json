@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "baseUrl": ".",
+        "paths": {
+            "resource:///org/gnome/shell/*": [
+                "./gnome-shell/js/*"
+            ]
+        }
+    },
+    "include": [
+        "**/*.js"
+    ]
+}

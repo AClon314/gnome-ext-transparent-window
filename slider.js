@@ -1,62 +1,51 @@
 import Gio from 'gi://Gio';
 import GObject from 'gi://GObject';
-
-import { QuickSlider, SystemIndicator } from '../quickSettings.js';
-
+import { QuickSlider } from '../quickSettings.js';
 import { loadInterfaceXML } from '../../misc/fileUtils.js';
+import { Logger } from './log.js'
 
 const BUS_NAME = 'org.gnome.SettingsDaemon.Power';
 const OBJECT_PATH = '/org/gnome/SettingsDaemon/Power';
 
-const BrightnessInterface = loadInterfaceXML('org.gnome.SettingsDaemon.Power.Screen');
-const BrightnessProxy = Gio.DBusProxy.makeProxyWrapper(BrightnessInterface);
+const TransparencyInterface = loadInterfaceXML('org.gnome.SettingsDaemon.Power.Screen');
+const TransparencyProxy = Gio.DBusProxy.makeProxyWrapper(TransparencyInterface);
 
-const BrightnessItem = GObject.registerClass(
-    class BrightnessItem extends QuickSlider {
-        _init() {
+export const TransparencySlider = GObject.registerClass(
+    class TransparencySlider extends QuickSlider {
+        _init(extensionObject) {
             super._init({
-                iconName: 'display-brightness-symbolic',
+                iconName: 'selection-mode-symbolic',
+                iconLabel: _('Icon Accessible Name'),
             });
 
-            this._proxy = new BrightnessProxy(Gio.DBus.session, BUS_NAME, OBJECT_PATH,
-                (proxy, error) => {
-                    if (error)
-                        console.error(error.message);
-                    else
-                        this._proxy.connect('g-properties-changed', () => this._sync());
-                    this._sync();
-                });
-
+            // Watch for changes and set an accessible name for the slider
             this._sliderChangedId = this.slider.connect('notify::value',
-                this._sliderChanged.bind(this));
-            this.slider.accessible_name = _('Brightness');
+                this._onSliderChanged.bind(this));
+            this.slider.accessible_name = _('Example Slider');
+
+            // Make the icon clickable (e.g. volume mute/unmute)
+            this.iconReactive = true;
+            this._iconClickedId = this.connect('icon-clicked',
+                () => Logger.debug('Slider icon clicked!'));
+
+            // Binding the slider to a GSettings key
+            this._settings = extensionObject.getSettings();
+            this._settings.connect('changed::slider-value',
+                this._onSettingsChanged.bind(this));
+            this._onSettingsChanged();
         }
 
-        _sliderChanged() {
-            const percent = this.slider.value * 100;
-            this._proxy.Brightness = percent;
-        }
-
-        _changeSlider(value) {
+        _onSettingsChanged() {
+            // Prevent the slider from emitting a change signal while being updated
             this.slider.block_signal_handler(this._sliderChangedId);
-            this.slider.value = value;
+            this.slider.value = this._settings.get_uint('slider-value') / 100.0;
             this.slider.unblock_signal_handler(this._sliderChangedId);
         }
 
-        _sync() {
-            const brightness = this._proxy.Brightness;
-            const visible = Number.isInteger(brightness) && brightness >= 0;
-            this.visible = visible;
-            if (visible)
-                this._changeSlider(this._proxy.Brightness / 100.0);
-        }
-    });
-
-export const Indicator = GObject.registerClass(
-    class Indicator extends SystemIndicator {
-        _init() {
-            super._init();
-
-            this.quickSettingsItems.push(new BrightnessItem());
+        _onSliderChanged() {
+            // Assuming our GSettings holds values between 0..100, adjust for the
+            // slider taking values between 0..1
+            const percent = Math.floor(this.slider.value * 100);
+            this._settings.set_uint('slider-value', percent);
         }
     });

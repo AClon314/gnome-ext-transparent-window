@@ -4,7 +4,7 @@ function getCircularReplacer() {
     return (key, value) => {
         if (typeof value === "object" && value !== null) {
             if (seen.has(value)) {
-                return "[Circular]";
+                return '🔁' + value.toString();
             }
             seen.add(value);
         }
@@ -94,7 +94,7 @@ export class Logger {
         Logger._logStructured(GLib.LogLevelFlags.LEVEL_CRITICAL, message);
     }
 
-    static dir(obj) {
-        Logger.debug(JSON.stringify(obj, getCircularReplacer(), 2));
+    static dir(obj, objName = '') {
+        Logger.debug(objName + JSON.stringify(obj, getCircularReplacer(), 2));
     }
 }
